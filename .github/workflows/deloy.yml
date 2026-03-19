@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'   # Trigger khi push tag (v1.0, v2.0,...)
+      - 'v*'   # trigger khi push tag v1.0, v2.0
 
 jobs:
   build-and-push:
@@ -16,22 +16,31 @@ jobs:
     - name: Bước 1 - Checkout code
       uses: actions/checkout@v6.0.2
 
-    # 🔹 Bước 2: Đăng nhập Docker Hub
+    # 🔹 Bước 2: Login Docker Hub
     - name: Bước 2 - Login Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # 🔹 Bước 3: Lấy version từ Git tag
-    - name: Bước 3 - Extract version
+    # 🔹 Bước 3: Xác định VERSION
+    - name: Bước 3 - Set version
       id: vars
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      run: |
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          VERSION=latest
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     # 🔹 Bước 4: Build Docker Image
     - name: Bước 4 - Build Docker Image
       run: |
+        echo "Build version: ${{ steps.vars.outputs.VERSION }}"
         docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }} .
+        
+        # luôn build thêm latest
         docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
 
-    # 🔹 Bước 5: Push Docker Image lên Docker Hub
+    # 🔹 Bước 5: Push Docker Image
     - name: Bước 5 - Push Docker Image
       run: |
         docker push ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }}
