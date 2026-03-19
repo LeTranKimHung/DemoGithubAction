@@ -1,57 +1,55 @@
-name: Deploy Docker Image (Command Line)
+name: Tự động Deploy lên Docker Hub
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
     tags:
-      - 'v*'
+      - 'v*'   # hỗ trợ version v1.0, v2.0
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    # 🔹 Bước 1: Checkout code
-    - name: Bước 1 - Checkout code
-      uses: actions/checkout@v6.0.2
+      # 🔹 Bước 1: Checkout code
+      - name: Bước 1 - Checkout code từ Github
+        uses: actions/checkout@v3
 
-    # 🔹 Bước 2: Docker login
-    - name: Bước 2 - Login Docker Hub
-      run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      # 🔹 Bước 2: Login Docker Hub
+      - name: Bước 2 - Đăng nhập Docker Hub
+        uses: docker/login-action@v4.0.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 🔹 Bước 3: Xác định version
-    - name: Bước 3 - Set version
-      id: vars
-      run: |
-        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-          VERSION=${GITHUB_REF#refs/tags/}
-        else
-          VERSION=latest
-        fi
-        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      # 🔹 Bước 3: Lấy version
+      - name: Bước 3 - Lấy version
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION=latest
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-    # 🔹 Bước 4: Build Backend Image
-    - name: Bước 4 - Build Backend
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }} .
-        docker tag ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }} ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+      # 🔹 Bước 4: Build & Push Backend
+      - name: Bước 4 - Build & Push Java Backend
+        uses: docker/build-push-action@v7.0.0
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-    # 🔹 Bước 5: Push Backend Image
-    - name: Bước 5 - Push Backend
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }}
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-
-    # 🔹 Bước 6: Build Frontend (nếu có)
-    - name: Bước 6 - Build Frontend
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/my-frontend:${{ steps.vars.outputs.VERSION }} ./cv-profile
-        docker tag ${{ secrets.DOCKER_USERNAME }}/my-frontend:${{ steps.vars.outputs.VERSION }} ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
-
-    # 🔹 Bước 7: Push Frontend
-    - name: Bước 7 - Push Frontend
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-frontend:${{ steps.vars.outputs.VERSION }}
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
+      # 🔹 Bước 5: Build & Push Frontend
+      - name: Bước 5 - Build & Push Nginx Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./cv-profile
+          file: ./cv-profile/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/my-frontend:${{ steps.vars.outputs.VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
