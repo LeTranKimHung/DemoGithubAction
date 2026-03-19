@@ -51,12 +51,8 @@ jobs:
       - name: Bước 5 - Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
-          # LƯU Ý: Nếu thư mục 'cv-profile' nằm ngang hàng với Dockerfile backend:
-          context: .
-          file: ./cv-profile/Dockerfile
+          context: .         # Chấm ở đây nghĩa là lấy ngay tại chỗ này
+          file: ./Dockerfile  # Nếu Dockerfile nằm ở gốc
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/my-frontend:${{ steps.vars.outputs.VERSION }}
             ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
