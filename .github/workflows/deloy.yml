@@ -14,7 +14,10 @@ jobs:
       - name: Bước 1 - Checkout code
         uses: actions/checkout@v4
 
-      # Thêm bước này để tránh lỗi build trên môi trường Github
+      # Kiểm tra cấu trúc thư mục (Giúp bạn debug nếu vẫn báo "path not found")
+      - name: Kiểm tra cấu trúc file
+        run: ls -R
+
       - name: Bước 1.5 - Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -37,19 +40,19 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile  # Đảm bảo file này tồn tại ở gốc
+          file: ./Dockerfile  # File này phải nằm ở thư mục gốc của repo
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }}
             ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-          # Thêm cache để build nhanh hơn và tránh lỗi tải thư viện
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Bước 5 - Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./cv-profile
+          # LƯU Ý: Nếu thư mục 'cv-profile' nằm ngang hàng với Dockerfile backend:
+          context: .
           file: ./cv-profile/Dockerfile
           push: true
           tags: |
