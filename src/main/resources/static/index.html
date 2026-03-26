@@ -4,193 +4,300 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lê Trần Kim Hưng – Giới thiệu bản thân</title>
+  <title>Lê Trần Kim Hưng | Profile</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #0a0a1a 100%);
-      color: #fff;
-      padding: 40px 20px;
-      position: relative;
-      overflow-x: hidden;
+    :root {
+      --primary: #3b82f6;
+      --secondary: #ec4899;
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
     }
 
-    .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.25; pointer-events: none; animation: floatBlob 10s ease-in-out infinite; }
-    .blob-1 { width: 500px; height: 500px; background: #3b5bdb; top: -150px; left: -150px; animation-delay: 0s; }
-    .blob-2 { width: 350px; height: 350px; background: #e64980; bottom: -100px; right: -80px; animation-delay: 4s; }
-    .blob-3 { width: 280px; height: 280px; background: #0ca678; top: 60%; left: 60%; animation-delay: 7s; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    @keyframes floatBlob {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(20px, -30px) scale(1.08); }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+      color: #f8fafc;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    /* Hiệu ứng hạt nền nhẹ nhàng */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+      opacity: 0.05;
+      pointer-events: none;
     }
 
     .card {
       position: relative;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 28px;
-      padding: 48px 44px;
-      max-width: 560px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 500px;
       width: 100%;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
     }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(50px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Dải màu trang trí phía trên */
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
     }
 
-    .avatar-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+    }
+
     .avatar {
-      width: 96px; height: 96px; border-radius: 50%;
-      background: linear-gradient(135deg, #3b5bdb, #9775fa);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.4rem; font-weight: 700; color: #fff;
-      box-shadow: 0 0 0 4px rgba(59, 91, 219, 0.3), 0 12px 30px rgba(59, 91, 219, 0.4);
-      animation: avatarPop 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
-    }
-    @keyframes avatarPop {
-      from { opacity: 0; transform: scale(0.5); }
-      to { opacity: 1; transform: scale(1); }
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
     }
 
-    .school-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(59, 91, 219, 0.18); border: 1px solid rgba(59, 91, 219, 0.45);
-      color: #91a7ff; font-size: 0.78rem; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 6px 16px; border-radius: 999px; margin-bottom: 20px;
+    /* Đèn nháy Status Live */
+    .status-dot {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 18px;
+      height: 18px;
+      background: #22c55e;
+      border: 3px solid var(--bg-dark);
+      border-radius: 50%;
+    }
+
+    .status-dot::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 99px;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
     h1 {
-      font-size: 2.1rem; font-weight: 800; letter-spacing: -0.5px;
-      margin-bottom: 6px;
-      background: linear-gradient(90deg, #c5d8ff, #ffffff, #d3b8ff);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+    }
+
+    .info-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .info-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 15px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .info-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .tech-wrap {
+      margin-top: 25px;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      background: #334155;
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .tag:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .docker-status {
+      margin-top: 30px;
+      background: #000;
+      border-radius: 12px;
+      padding: 15px;
+      border-left: 4px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .terminal-text {
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: #22c55e;
+    }
+
+    .footer {
+      margin-top: 30px;
       text-align: center;
+      font-size: 0.7rem;
+      color: #475569;
     }
-
-    .major-tag {
-      text-align: center; font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.5); margin-bottom: 32px; font-weight: 400;
-    }
-    .major-tag span { color: #74c0fc; font-weight: 600; }
-
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
-    .info-card {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 16px; padding: 18px 16px;
-      transition: background 0.25s, transform 0.25s, border-color 0.25s; cursor: default;
-    }
-    .info-card:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-4px); }
-    .info-card .ic-icon { font-size: 1.4rem; margin-bottom: 8px; }
-    .info-card .ic-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-bottom: 4px; }
-    .info-card .ic-value { font-size: 0.95rem; font-weight: 700; color: #e9ecef; }
-    .info-card.full { grid-column: 1 / -1; }
-
-    .tech-section { margin-bottom: 28px; }
-    .tech-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-bottom: 12px; }
-    .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .tech-tag {
-      background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);
-      color: rgba(255, 255, 255, 0.75); font-size: 0.8rem; font-weight: 500;
-      padding: 5px 14px; border-radius: 8px; transition: background 0.2s, color 0.2s;
-    }
-    .tech-tag:hover { background: rgba(59, 91, 219, 0.3); border-color: rgba(59, 91, 219, 0.6); color: #c5d8ff; }
-
-    .docker-banner {
-      background: linear-gradient(135deg, rgba(0, 120, 212, 0.2), rgba(0, 173, 239, 0.15));
-      border: 1px solid rgba(0, 173, 239, 0.3); border-radius: 14px;
-      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
-      font-size: 0.87rem; color: #74c0fc; font-weight: 500;
-    }
-    .docker-banner .d-icon { font-size: 1.5rem; }
-    .docker-banner strong { color: #a5d8ff; }
-
-    .card-footer { text-align: center; margin-top: 28px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 0.04em; }
   </style>
 </head>
 
 <body>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-
   <div class="card">
-    <div class="avatar-wrap">
-      <div class="avatar">LH</div>
+    <div class="header">
+      <div class="avatar-container">
+        <div class="avatar">KH</div>
+        <div class="status-dot"></div>
+      </div>
+      <span class="badge">HUTECH IT Student</span>
+      <h1>Lê Trần Kim Hưng</h1>
+      <p class="subtitle">Chuyên ngành Công nghệ Thông tin</p>
     </div>
 
-    <div style="text-align:center;">
-      <div class="school-badge">🏫 Đại học Công nghệ TP.HCM – HUTECH</div>
-    </div>
-
-    <h1>Lê Trần Kim Hưng</h1>
-    <p class="major-tag">Chuyên ngành <span>Công nghệ Thông tin</span></p>
-
-    <div class="info-grid">
-      <div class="info-card">
-        <div class="ic-icon">🎓</div>
-        <div class="ic-label">Lớp</div>
-        <div class="ic-value">22DTHG4</div>
+    <div class="info-list">
+      <div class="info-item">
+        <span class="info-label">MSSV</span>
+        <span class="info-value">2280601297</span>
       </div>
-      <div class="info-card">
-        <div class="ic-icon">🪪</div>
-        <div class="ic-label">MSSV</div>
-        <div class="ic-value">2280601297</div>
+      <div class="info-item">
+        <span class="info-label">Lớp</span>
+        <span class="info-value">22DTHG4</span>
       </div>
-      <div class="info-card">
-        <div class="ic-icon">📅</div>
-        <div class="ic-label">Khóa học</div>
-        <div class="ic-value">2022 – 2026</div>
+      <div class="info-item">
+        <span class="info-label">Khóa</span>
+        <span class="info-value">2022 - 2026</span>
       </div>
-      <div class="info-card">
-        <div class="ic-icon">📍</div>
-        <div class="ic-label">Cơ sở</div>
-        <div class="ic-value">TP. Hồ Chí Minh</div>
-      </div>
-      <div class="info-card full">
-        <div class="ic-icon">🏛️</div>
-        <div class="ic-label">Trường</div>
-        <div class="ic-value">Trường Đại học Công nghệ TP. Hồ Chí Minh (HUTECH)</div>
+      <div class="info-item">
+        <span class="info-label">Cơ sở</span>
+        <span class="info-value">E3 - HCMC</span>
       </div>
     </div>
 
-    <div class="tech-section">
-      <div class="tech-title">⚙️ Công nghệ sử dụng</div>
+    <div class="tech-wrap">
+      <span class="info-label">Tech Stack</span>
       <div class="tech-tags">
-        <span class="tech-tag">☕ Java 17</span>
-        <span class="tech-tag">🌿 Spring Boot 3</span>
-        <span class="tech-tag">🐋 Docker</span>
-        <span class="tech-tag">🌐 HTML / CSS</span>
-        <span class="tech-tag">🔧 Maven</span>
+        <span class="tag">Java 17</span>
+        <span class="tag">Spring Boot</span>
+        <span class="tag">Docker</span>
+        <span class="tag">CI/CD</span>
+        <span class="tag">MySQL</span>
       </div>
     </div>
 
-    <div class="docker-banner">
-      <span class="d-icon">🐋</span>
-      <div>
-        Ứng dụng đang chạy trong <strong>Docker Container</strong><br />
-        <span style="font-size:0.8rem; opacity:0.7;">Spring Boot · Port 8080 · 2026</span>
+    <div class="docker-status">
+      <div style="font-size: 1.5rem;">🐋</div>
+      <div class="terminal-text">
+        $ docker ps<br>
+        <span style="color: #fff;">STATUS: </span> Up 2 minutes (healthy)<br>
+        <span style="color: #fff;">PORT: </span> 0.0.0.0:8080->8080
       </div>
     </div>
 
-    <div class="card-footer">
-      LeTranKimHung · HUTECH · 22DTHG4 · 2280601297
+    <div class="footer">
+      Built with ❤️ & GitHub Actions | 2026
     </div>
   </div>
 </body>
