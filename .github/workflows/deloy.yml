@@ -48,7 +48,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          # Lưu ý: Nếu có file Dockerfile riêng cho frontend, hãy sửa ở đây (vd: ./frontend.Dockerfile)
           file: ./Dockerfile 
           push: true
           tags: |
@@ -58,33 +57,38 @@ jobs:
 
       - name: Triển khai lên DevOps Classroom
         env:
-          # Sử dụng biến để tránh gõ sai tên
-          DOCKER_REPO: "letrankimhung/my-frontend"
-          CONTAINER_PORT: 80
+          # Sử dụng username từ secret để ghép tên repo chính xác
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
         run: |
-          echo "Đang gửi yêu cầu deploy cho $DOCKER_REPO..."
+          REPO_NAME="$DOCKER_USER/my-frontend"
+          PORT=80
           
-          # Thực hiện gọi Webhook
-          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$DOCKER_REPO&tag=latest&slot=1&container_port=$CONTAINER_PORT")
+          echo "Đang gọi Webhook cho: $REPO_NAME"
           
-          # Tách nội dung JSON và mã lỗi HTTP
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          CODE=$(echo "$RESPONSE" | tail -n1)
+          # Thực hiện CURL và lấy cả Body lẫn Http Code
+          # Lưu ý: Kiểm tra kỹ DEPLOY_URL trong GitHub Secrets xem có thừa dấu / ở cuối không
+          RESPONSE=$(curl -sS -L -w "\n%{http_code}" -X POST "${DEPLOY_URL}?repo=${REPO_NAME}&tag=latest&slot=1&container_port=${PORT}")
           
-          echo "Webhook HTTP Status Code: $CODE"
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           
-          if [ "$CODE" -eq 502 ]; then
-            echo "::error::Lỗi 502: Server Classroom đang bảo trì hoặc quá tải. Hãy thử lại sau vài phút."
-            exit 1
-          elif [ "$CODE" -lt 200 ] || [ "$CODE" -ge 300 ]; then
-            echo "Deploy thất bại với lỗi: $CODE"
-            echo "::group::Chi tiết phản hồi từ Server"
-            echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
+          echo "Kết quả trả về (HTTP Code): $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ]; then
+            echo "✅ Deploy thành công!"
+            echo "::group::Chi tiết phản hồi"
+            echo "$HTTP_BODY" | python3 -m json.tool 2>/dev/null || echo "$HTTP_BODY"
+            echo "::endgroup::"
+          else
+            echo "❌ Deploy thất bại với lỗi $HTTP_CODE"
+            if [ "$HTTP_CODE" -eq 404 ]; then
+               echo "LƯU Ý: Lỗi 404 nghĩa là DEPLOY_URL của bạn bị sai đường dẫn. Hãy kiểm tra lại Settings > Secrets."
+            elif [ "$HTTP_CODE" -eq 502 ]; then
+               echo "LƯU Ý: Lỗi 502 nghĩa là Server Classroom đang bị sập hoặc quá tải."
+            fi
+            echo "::group::Nội dung lỗi chi tiết"
+            echo "$HTTP_BODY"
             echo "::endgroup::"
             exit 1
           fi
-          
-          echo "Chúc mừng! Deploy thành công."
-          echo "::group::Thông tin chi tiết"
-          echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
-          echo "::endgroup::"
