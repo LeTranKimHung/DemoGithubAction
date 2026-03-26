@@ -3,13 +3,11 @@ name: Tự động Deploy lên Docker Hub
 on:
   push:
     branches: [ "main" ]
-    tags:
-      - 'v*'
+  workflow_dispatch: # Cho phép bạn nhấn nút "Run workflow" thủ công để test
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Bước 1 - Checkout code
         uses: actions/checkout@v4
@@ -25,52 +23,49 @@ jobs:
 
       - name: Bước 3 - Lấy version
         id: vars
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION=latest" >> $GITHUB_OUTPUT
-          fi
+        run: echo "VERSION=latest" >> $GITHUB_OUTPUT
 
-      - name: Bước 4 - Build & Push Backend (App)
+      - name: Bước 4 - Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile 
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/my-app:${{ steps.vars.outputs.VERSION }}
-            ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Bước 5 - Build & Push Frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile 
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/my-frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Triển khai lên DevOps Classroom
         run: |
-          REPO="letrankimhung/my-frontend"
-          CONTAINER_PORT=80
-          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=latest&slot=4&container_port=$CONTAINER_PORT")
-          BODY=$(echo "$RESPONSE" | sed "$d")
+          # Cấu hình thông tin
+          REPO="${{ secrets.DOCKER_USERNAME }}/my-frontend"
+          URL="${{ secrets.DEPLOY_URL }}"
+          PORT=80
+          SLOT=4
+          
+          echo "Đang gọi Webhook tới Server Classroom (Slot $SLOT)..."
+          
+          # Sử dụng curl với các flag mạnh hơn để debug
+          # -L: Theo dõi chuyển hướng
+          # --retry 2: Thử lại 2 lần nếu server bận
+          RESPONSE=$(curl -sS -L --retry 2 -w "\n%{http_code}" -X POST "$URL?repo=$REPO&tag=latest&slot=$SLOT&container_port=$PORT")
+          
+          BODY=$(echo "$RESPONSE" | sed '$d')
           CODE=$(echo "$RESPONSE" | tail -n1)
-          echo "Webhook HTTP: $CODE"
-          if [ "$CODE" -lt 200 ] || [ "$CODE" -ge 300 ]; then
-            echo "Deploy thất bại. Xem chi tiết trong nhóm log bên dưới."
-            echo "::group::Chi tiết webhook JSON"
+          
+          echo "Webhook HTTP Response Code: $CODE"
+          
+          if [ "$CODE" -eq 200 ] || [ "$CODE" -eq 201 ]; then
+            echo "✅ DEPLOY THÀNH CÔNG!"
+            echo "::group::Chi tiết phản hồi JSON"
             echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
+            echo "::endgroup::"
+          else
+            echo "❌ DEPLOY THẤT BẠI!"
+            echo "Mã lỗi: $CODE"
+            echo "Lưu ý: Nếu là 502, hãy đợi 5 phút rồi nhấn 'Re-run all jobs'. Nếu là 404, hãy kiểm tra lại DEPLOY_URL trong Secrets."
+            echo "::group::Nội dung phản hồi từ server"
+            echo "$BODY"
             echo "::endgroup::"
             exit 1
           fi
-          echo "Deploy thành công."
-          echo "::group::Chi tiết webhook JSON"
-          echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
-          echo "::endgroup::"
